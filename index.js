@@ -4,7 +4,9 @@ const db = require('./db');
 const MenuItem = require('./models/menuItem');
 const Person = require('./models/person');
 const app = express();
-const port = 3000;
+require('dotenv').config();
+
+const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
@@ -31,9 +33,6 @@ app.get('/', (req, res) => {
   res.send(htmlContent);
 });
 
-// i added this comment
-let atif = "atif here"; 
-let anotherVar = "another var here";
 const personRoutes = require('./routes/person');
 app.use('/person', personRoutes);
 

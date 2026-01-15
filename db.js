@@ -1,7 +1,8 @@
 // import mongoose module
 const mongoose = require('mongoose');
+require('dotenv').config();
 // define mongoDB connection string
-const mongoURI = 'mongodb://localhost:27017/AtifDB';
+const mongoURI = process.env.MONGODB_URI;;
 // connect to MongoDB using mongoose
 mongoose.connect(mongoURI)
 
