@@ -24,8 +24,8 @@ app.listen(port, () => {
 
 // applying authentication middleware to protect the route
 app.get('/', (req, res) => {
-  try{
-  const htmlContent = `
+  try {
+    const htmlContent = `
     <html>
         <head>  
             <title>Welcome Page</title>
@@ -36,9 +36,9 @@ app.get('/', (req, res) => {
         </body>
     </html>
   `;
-  res.send(htmlContent);
+    res.send(htmlContent);
   }
-  catch(error){
+  catch (error) {
     res.status(500).json({ error: 'Failed to load page' });
   }
 });
@@ -50,7 +50,7 @@ app.post('/login', localAuthMiddleware, (req, res) => {
 
 // applying authentication middleware to protect the route
 const personRoutes = require('./routes/person');
-app.use('/person',localAuthMiddleware, personRoutes);
+app.use('/person', localAuthMiddleware, personRoutes);
 
 const menuRoutes = require('./routes/menu');
 app.use('/menu', menuRoutes);

@@ -2,6 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const Person = require('./models/person');
 const app = require('express')();
+const bcrypt = require('bcrypt');
 // implementing local authentication strategy
 passport.use(new LocalStrategy(async (User, password, done) => {
   try {
@@ -10,11 +11,12 @@ passport.use(new LocalStrategy(async (User, password, done) => {
     // console.log("Received username:", User);
     // console.log("Received password:", password);
     if (!username) {
-      // done(error,user,info)'
-      console.log("Username not found");
-      return done(null, false, { message: 'Incorrect username' });
+        // done(error,user,info)'
+        console.log("Username not found");
+        return done(null, false, { message: 'Incorrect username' });
     }
-    if (password !== username.password) {
+    const isPasswordMatch = await bcrypt.compare(password, username.password);
+    if (!isPasswordMatch) {
       console.log("Password mismatch");
       return done(null, false, { message: 'Incorrect password' });
     }
