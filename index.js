@@ -14,6 +14,7 @@ const bodyParser = require('body-parser');
 // using middleware for every endpoint
 app.use(logRequest);
 
+// these are also body parsing middlewares
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -43,14 +44,12 @@ app.get('/', (req, res) => {
   }
 });
 
-// login route to authenticate user
-app.post('/login', localAuthMiddleware, (req, res) => {
-  res.json({ message: 'Login successful', user: req.user });
-});
+
 
 // applying authentication middleware to protect the route
 const personRoutes = require('./routes/person');
-app.use('/person', localAuthMiddleware, personRoutes);
+app.use('/person', personRoutes);
 
 const menuRoutes = require('./routes/menu');
-app.use('/menu', menuRoutes);
+const { jwtAuthMiddleware } = require('./jwt');
+app.use('/menu',jwtAuthMiddleware, menuRoutes);

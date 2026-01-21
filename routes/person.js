@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Person = require('../models/person');
-
+const localAuthMiddleware = require('../auth');
+const bcrypt = require('bcrypt');
+const {jwtAuthMiddleware, generateToken} = require('../jwt');
 router.get('/', async (req, res) => {
   try {
     const persons = await Person.find();
@@ -10,14 +12,66 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch persons' });
   }
 });
-router.post('/', async (req, res) => {
+
+router.post('/signup', async (req, res) => {
   try {
     const newPerson = new Person(req.body);
     const savedPerson = await newPerson.save();
-    res.status(201).json(savedPerson);
+
+    // generate JWT token upon successful signup
+    const token = generateToken(savedPerson);
+    console.log('Generated JWT Token:', token);
+
+    res.status(201).json({ user: savedPerson, token: token });
   } catch (error) {
     res.status(400).json({ error: 'Failed to add person', message: error.message });
   }
+});
+
+router.post('/login',async (req,res)=>{
+    try{
+        const { username, password } = req.body;
+        const person = await Person.findOne({ username: username });
+        if(!person){
+            return res.status(400).json({ error: 'Invalid username' });
+        }
+        const isPasswordMatch = await bcrypt.compare(password, person.password);
+        if(!isPasswordMatch){
+            return res.status(400).json({ error: 'Invalid password' });
+        }
+        else{
+            const token = generateToken(person);
+            console.log('Generated JWT Token on login:', token);
+            res.setHeader('Authorization', token);
+            res.send(token);
+            res.json({ message: 'Login successful', user: person });
+        }
+    }
+    catch(error){
+        res.status(500).json({ error: 'Login failed', message: error.message });
+    }
+});
+
+
+
+router.get('/profile',jwtAuthMiddleware,async(req,res)=>{
+    try{
+        const user = req.user;
+        const userId = user.id;
+        const person = await Person.findById(userId);
+        if(!person){
+            res.status(404);
+            res.send({ error: 'Person not found' });
+        }
+        
+        res.send(person);
+        res.status(200);
+    }
+    catch(error){
+        console.error('Error fetching profile:', error);
+        res.status(500).json({ error: 'Failed to fetch profile' });
+    }
+
 });
 
 

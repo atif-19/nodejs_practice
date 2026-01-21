@@ -13,11 +13,14 @@ const personSchema = new mongoose.Schema({
 // ✅ hashing the password
 // we should not use arrow function here to access 'this'
 // we should not use next parameter here as we are using async/await
+
+// we should perform all middleware operations before model is saved
 personSchema.pre('save', async function () {
   console.log("Pre-save hook triggered for user:", this.username);
   if (!this.isModified('password')) return;
 
   try {
+    // adding salt and hashing password
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   } catch (err) {

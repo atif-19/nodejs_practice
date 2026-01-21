@@ -13,7 +13,7 @@ router.post('/addmenuitems', async (req, res) =>
         res.status(400).json({ error: 'Failed to add menu item' });
     }
 });
-router.get('/getmenuitems', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const menuItems = await MenuItem.find();
         res.json(menuItems);
